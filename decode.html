@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/decode.css">
+    <title>decode</title>
+</head>
+<body>
+    <% if (typeof(data) != "undefined") { %>
+        <p style="display:none" id="rawData"><%= data %></p>
+    <% } %>
+    <div class="boxHolder"></div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <% if (typeof(data) != "undefined") { %>
+        <script>
+            function createSquare(title, value) {
+                let container = $(`<div class="dataSquare"></div>`);
+                let titleHtml = $(`<h1>${title}</h1>`);
+                let valueHtml = $(`<p>${value}</p>`);
+                container.append([titleHtml, $("<hr>"), valueHtml]);
+                return container;
+            }
+
+            let data = JSON.parse($("#rawData").text());
+            
+            $("#rawData").remove();
+
+            Object.keys(data).forEach((key) => {
+                $(".boxHolder").append(createSquare(key.toUpperCase(), data[key]));
+            });
+            
+        </script>
+    <% } %> 
+</body>
+</html>
