@@ -9,3 +9,4 @@ qrconfig.json
 public/css/*.css
 public/css/*.css.map
 *.xlsx
+serverConfig.json
