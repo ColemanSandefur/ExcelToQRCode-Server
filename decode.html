@@ -13,23 +13,27 @@
     <% if (typeof(uuid) != "undefined") {  %>
         <p style="display:none" id="uuid"><%= uuid %></p>
     <% } %>
-    <form><div class="boxHolder"></div></form>
+    <% if (typeof(validFluids) != "undefined") { %>
+        <p style="display:none" id="validFluids"><%= validFluids %></p>
+    <% } %>
+    <div class="boxHolder"></div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <% if (typeof(data) != "undefined" && typeof(uuid) != "undefined") { %>
+    <% if (typeof(data) != "undefined" && typeof(uuid) != "undefined" && typeof(validFluids) != "undefined") { %>
         <script>
             const uuid = $("#uuid").text();
+            const validFluids = JSON.parse($("#validFluids").text()); //A json object that will list all of the valid liqids for pipes
 
             $(() => {
                 let data = JSON.parse($("#rawData").text());
 
-                function sendForm() {
+                function sendForm() { //Called when updating a field to update the server
                     $.ajax({
                         url: "/update",
                         type: "POST",
                         data: {
                             UUID: $("#uuid").text(),
                             valveFlow: $("#valveFlow").children("p").text() == "Open" ? true : false,
-                            fluid: $("#fluid").children("p").text()
+                            fluid: $("#fluid").children("select").val()
                         },
                         success: function(msg) {
                         }
@@ -55,7 +59,7 @@
                 function createSquareToggle(title, value, callback) {
                     let container = $(`<div class="dataSquare"></div>`);
                     let titleHtml = $(`<h1>${title}</h1>`);
-                    let valueHtml = $(`<p>${value}</p>`)
+                    let valueHtml = $(`<p class="button">${value}</p>`)
                     valueHtml.click(callback);
                     // valueHtml.on("click", callback(event));
                     container.append([titleHtml, $("<hr>"), valueHtml]);
@@ -65,15 +69,33 @@
                 function createSquareToggle(title, value, id, callback) {
                     let container = $(`<div id="${id}" class="dataSquare"></div>`);
                     let titleHtml = $(`<h1>${title}</h1>`);
-                    let valueHtml = $(`<p>${value}</p>`)
+                    let valueHtml = $(`<p class="button">${value}</p>`)
                     valueHtml.click(callback);
                     // valueHtml.on("click", callback(event));
                     container.append([titleHtml, $("<hr>"), valueHtml]);
                     return container;
                 }
+
+                function createSquareDropdown(title, index, possibleValues, id, callback) {
+                    let container = $(`<div id="${id}" class="dataSquare"></div>`);
+                    let titleHtml = $(`<h1>${title}</h1>`);
+                    let valueHtml = $(`<select class="button"></select>`);
+
+                    for (let i = 0; i < possibleValues.length; i++) {
+                        let option = ($(`<option value="${possibleValues[i]}">${possibleValues[i]}</option>`));
+                        if (i == index) {
+                            option.prop("selected", true);
+                        }
+                        valueHtml.append(option);
+                    }
+
+                    valueHtml.change(callback);
+
+                    container.append([titleHtml, $("<hr>"), valueHtml]);
+                    return container;
+                }
                 
                 $("#rawData").remove();
-                // $("#uuid").remove();
 
                 Object.keys(data).forEach((key) => {
                     let name = key;
@@ -83,7 +105,9 @@
                         name = "Valve ID";
                     } else if (name == "fluid") {
                         name = "Fluid";
-                        square = $(".boxHolder").append(createSquare(name, value, "fluid"));
+                        square = $(".boxHolder").append(createSquareDropdown(name, validFluids.indexOf(value), validFluids, "fluid", function(event) {
+                            sendForm();
+                        }));
                     } else if (name == "valveFlow") {
                         name = "Valve Flow";
                         value = (value == true)? "Open" : "Closed";

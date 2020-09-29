@@ -30,11 +30,19 @@ body {
         margin: 0;
     }
 
-    p {
+    p,select {
         padding: 0;
         margin: 0;
         text-align: center;
         font-size: 1.5rem;
+        margin-top: .5rem;
+        border: none;
+
+        &.button {
+            background-color:lightgray;
+            border-radius: 10px;
+            user-select: none;
+        }
     }
 }
 

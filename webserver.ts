@@ -50,7 +50,7 @@ app.get("/decode/:UUID", (req, res) => {
             delete data.id;
 
             //put the data into desired html file using ejs
-            res.send(ejs.render(html.toString(), {"data": JSON.stringify(data), "uuid": req.params["UUID"]}));
+            res.send(ejs.render(html.toString(), {"data": JSON.stringify(data), "uuid": req.params["UUID"], "validFluids": JSON.stringify(ConfigManager.config.fluids)}));
         });
     });
 });
