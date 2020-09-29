@@ -22,6 +22,7 @@ app.use(express.static(path.join(__dirname, "static")));
 import {ConfigManager} from "./config-manager";
 ConfigManager.loadConfig("serverConfig.json");
 
+// Import the database and connect to it
 import {DatabaseManager} from "./database-manager";
 DatabaseManager.initializeDatabase();
 
@@ -49,11 +50,12 @@ app.get("/decode/:UUID", (req, res) => {
             delete data.id;
 
             //put the data into desired html file using ejs
-            res.send(ejs.render(html.toString(), {"data": JSON.stringify(data)}));
+            res.send(ejs.render(html.toString(), {"data": JSON.stringify(data), "uuid": req.params["UUID"]}));
         });
     });
 });
 
+//Create a new row in the database
 app.post("/encode", (req, res) => {
     //Get data from post: req.body.value
     //Make sure that each of the fields are defined before trying to instert it to the database
@@ -66,8 +68,9 @@ app.post("/encode", (req, res) => {
     });
 });
 
+//For updating an existing row in the database
 app.post("/update", (req, res) => {
-    let data:{"valveFlow"?: boolean, "fluid"?: number, "valveID"?: number} = {};
+    let data:{"valveFlow"?: boolean, "fluid"?: string, "valveID"?: number} = {};
 
     //Put only defined variables into data
     if (req.body.valveFlow != undefined) {

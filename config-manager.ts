@@ -7,6 +7,7 @@ export class Config {
         "password": string,
         "databaseName": string
     }
+    "fluids": string[];
 }
 export class ConfigManager {
     static config: Config;
@@ -22,6 +23,7 @@ export class ConfigManager {
     private static createConfigFile(path: string) {
         let newConfig:Config = new Config();
         newConfig.database = {"host": "localhost", "user": "root", "password": "", "databaseName": "qr_valve_data"};
+        newConfig.fluids = ["water","petrolium", "crude oil"];
         fs.writeFileSync(path, JSON.stringify(newConfig, null, "\t"));
     }
 }

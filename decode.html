@@ -10,26 +10,95 @@
     <% if (typeof(data) != "undefined") { %>
         <p style="display:none" id="rawData"><%= data %></p>
     <% } %>
-    <div class="boxHolder"></div>
+    <% if (typeof(uuid) != "undefined") {  %>
+        <p style="display:none" id="uuid"><%= uuid %></p>
+    <% } %>
+    <form><div class="boxHolder"></div></form>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <% if (typeof(data) != "undefined") { %>
+    <% if (typeof(data) != "undefined" && typeof(uuid) != "undefined") { %>
         <script>
-            function createSquare(title, value) {
-                let container = $(`<div class="dataSquare"></div>`);
-                let titleHtml = $(`<h1>${title}</h1>`);
-                let valueHtml = $(`<p>${value}</p>`);
-                container.append([titleHtml, $("<hr>"), valueHtml]);
-                return container;
-            }
+            const uuid = $("#uuid").text();
 
-            let data = JSON.parse($("#rawData").text());
-            
-            $("#rawData").remove();
+            $(() => {
+                let data = JSON.parse($("#rawData").text());
 
-            Object.keys(data).forEach((key) => {
-                $(".boxHolder").append(createSquare(key.toUpperCase(), data[key]));
+                function sendForm() {
+                    $.ajax({
+                        url: "/update",
+                        type: "POST",
+                        data: {
+                            UUID: $("#uuid").text(),
+                            valveFlow: $("#valveFlow").children("p").text() == "Open" ? true : false,
+                            fluid: $("#fluid").children("p").text()
+                        },
+                        success: function(msg) {
+                        }
+                    })
+                }
+
+                function createSquare(title, value) {
+                    let container = $(`<div class="dataSquare"></div>`);
+                    let titleHtml = $(`<h1>${title}</h1>`);
+                    let valueHtml = $(`<p>${value}</p>`);
+                    container.append([titleHtml, $("<hr>"), valueHtml]);
+                    return container;
+                }
+
+                function createSquare(title, value, id) {
+                    let container = $(`<div id="${id}" class="dataSquare"></div>`);
+                    let titleHtml = $(`<h1>${title}</h1>`);
+                    let valueHtml = $(`<p>${value}</p>`);
+                    container.append([titleHtml, $("<hr>"), valueHtml]);
+                    return container;
+                }
+
+                function createSquareToggle(title, value, callback) {
+                    let container = $(`<div class="dataSquare"></div>`);
+                    let titleHtml = $(`<h1>${title}</h1>`);
+                    let valueHtml = $(`<p>${value}</p>`)
+                    valueHtml.click(callback);
+                    // valueHtml.on("click", callback(event));
+                    container.append([titleHtml, $("<hr>"), valueHtml]);
+                    return container;
+                }
+
+                function createSquareToggle(title, value, id, callback) {
+                    let container = $(`<div id="${id}" class="dataSquare"></div>`);
+                    let titleHtml = $(`<h1>${title}</h1>`);
+                    let valueHtml = $(`<p>${value}</p>`)
+                    valueHtml.click(callback);
+                    // valueHtml.on("click", callback(event));
+                    container.append([titleHtml, $("<hr>"), valueHtml]);
+                    return container;
+                }
+                
+                $("#rawData").remove();
+                // $("#uuid").remove();
+
+                Object.keys(data).forEach((key) => {
+                    let name = key;
+                    let value = data[key];
+                    let square = null;
+                    if (name == "valveID") {
+                        name = "Valve ID";
+                    } else if (name == "fluid") {
+                        name = "Fluid";
+                        square = $(".boxHolder").append(createSquare(name, value, "fluid"));
+                    } else if (name == "valveFlow") {
+                        name = "Valve Flow";
+                        value = (value == true)? "Open" : "Closed";
+                        square = (createSquareToggle(name, value, "valveFlow", function(event) {
+                            $(this).text(($(this).text()=="Closed")? "Open" : "Closed");
+                            sendForm();
+                        }));
+                    }
+                    if (square == null) {
+                        $(".boxHolder").append(createSquare(name, value));
+                    } else {
+                        $(".boxHolder").append(square);
+                    }
+                });
             });
-            
         </script>
     <% } %> 
 </body>

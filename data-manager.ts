@@ -1,16 +1,31 @@
 import {DatabaseManager} from "./database-manager";
+import {ConfigManager} from "./config-manager";
 
 export class ValveTable {
+    constructor(id?: number, valveFlow?: boolean, fluid?: string, valveID?: number) {
+        this.id = id || 0;
+        this.valveFlow = valveFlow || false;
+        this.fluid = fluid || ConfigManager.config.fluids[0];
+        this.valveID = valveID || 0;
+    }
+    "valveID": number;
     "id": number;
     "valveFlow": boolean;
-    "fluid": number; 
+    "fluid": string; 
+    
+}
+export class EncodeValveTable {
+    "id": number;
+    "valveFlow": number;
+    "fluid": number;
     "valveID": number;
 }
 
 export class DataManager {
-    public static AddRow(valveFlow: boolean, fluid: number, valveID: number): Promise<String | null> {
+    public static AddRow(valveFlow: boolean, fluid: string, valveID: number): Promise<String | null> {
         return new Promise((res, rej) => {
-            DatabaseManager.dbQuery("INSERT INTO valves (valveFlow, fluid, valveID) VALUES (?, ?, ?)", [valveFlow, fluid, valveID]).then((returnedData) => {
+            let encoded = this.EncodeToDatabase({"id": 0, "valveFlow": valveFlow, "fluid": fluid, "valveID": valveID});
+            DatabaseManager.dbQuery("INSERT INTO valves (valveFlow, fluid, valveID) VALUES (?, ?, ?)", [encoded.valveFlow, encoded.fluid, encoded.valveID]).then((returnedData) => {
                 if (returnedData.length == 0) {
                     res(null);
                     return;
@@ -71,15 +86,14 @@ export class DataManager {
                         return;
                     }
 
-                    let table:ValveTable = <ValveTable>returnedData[0];
-                    table.valveFlow = (<any>returnedData[0]).valveFlow == 1;
-                    res(<ValveTable>returnedData[0]);
+                    let table:ValveTable = this.DecodeFromDatabase(<EncodeValveTable>returnedData[0]);
+                    res(table);
                 });
             });
         });
     }
 
-    public static EditRow(UUID: String, data: {"valveFlow"?: boolean, "fluid"?: number, "valveID"?: number}): Promise<boolean> {
+    public static EditRow(UUID: String, data: {"valveFlow"?: boolean, "fluid"?: string, "valveID"?: number}): Promise<boolean> {
         return new Promise((res, rej) => {
             this.GetRow(UUID).then((returnedData) => {
                 if (returnedData == null) {
@@ -87,15 +101,39 @@ export class DataManager {
                     return;
                 }
 
-                let valveFlow = ((data.valveFlow != undefined)? data.valveFlow : returnedData.valveFlow)? 1 : 0; //converts to tinyint for the database
+                let valveFlow = ((data.valveFlow != undefined)? data.valveFlow : returnedData.valveFlow)
                 let fluid = (data.fluid != undefined)? data.fluid : returnedData.fluid;
                 let valveID = (data.valveID != undefined)? data.valveID : returnedData.valveID;
 
-                DatabaseManager.dbQuery("UPDATE valves SET valveFlow=?, fluid=?, valveID=? WHERE id=?", [valveFlow, fluid, valveID, returnedData.id]).then(() => {
+                let dataEncode = this.EncodeToDatabase(new ValveTable(returnedData.id, valveFlow, fluid, valveID));
+                
+                DatabaseManager.dbQuery("UPDATE valves SET valveFlow=?, fluid=?, valveID=? WHERE id=?", [dataEncode.valveFlow, dataEncode.fluid, dataEncode.valveID, dataEncode.id]).then(() => {
                     res(true);
                     return;
                 });
             });
         });
+    }
+
+    private static EncodeToDatabase(table: ValveTable) {
+        let encoded = new EncodeValveTable();
+
+        encoded.id = table.id;
+        encoded.fluid = ConfigManager.config.fluids.indexOf(table.fluid)
+        encoded.valveFlow = (table.valveFlow == true)? 1 : 0;
+        encoded.valveID = table.valveID;
+
+        return encoded;
+    }
+
+    private static DecodeFromDatabase(table: EncodeValveTable) {
+        let decoded = new ValveTable;
+
+        decoded.id = table.id;
+        decoded.valveID = table.valveID;
+        decoded.fluid = ConfigManager.config.fluids[table.fluid];
+        decoded.valveFlow = (table.valveFlow == 1)? true : false;
+
+        return decoded;
     }
 }

@@ -23,7 +23,7 @@ export class DatabaseManager{
             con.changeUser({database: ConfigManager.config.database.databaseName}, (err) => { // starts using the database with the databaseName given
                 if (err) throw err;
 
-                //Creates a table for storing valve data if it doesn't already exist
+                //Creates a table for storing data if it doesn't already exist
                 this.dbQuery("CREATE TABLE IF NOT EXISTS `qr_valve_data`.`valves` (`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,`valveFlow` TINYINT UNSIGNED NOT NULL DEFAULT 0,`fluid` INT NOT NULL DEFAULT -1,`valveID` INT NOT NULL,PRIMARY KEY (`id`),UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE, UNIQUE INDEX `valveID_UNIQUE` (`valveID` ASC) VISIBLE);");
                 this.dbQuery("CREATE TABLE IF NOT EXISTS `qr_valve_data`.`id_manager` (`UUID` VARCHAR(15) NOT NULL,`valve_row_id` INT UNSIGNED NOT NULL,PRIMARY KEY (`UUID`),UNIQUE INDEX `UUID_UNIQUE` (`UUID` ASC) VISIBLE,UNIQUE INDEX `valve_row_id_UNIQUE` (`valve_row_id` ASC) VISIBLE);");
                 
