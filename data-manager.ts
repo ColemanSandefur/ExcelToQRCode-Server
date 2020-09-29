@@ -15,7 +15,6 @@ export class DataManager {
                     res(null);
                     return;
                 }
-                console.log(returnedData);
                 let rowID = (<any>returnedData).insertId;
 
                 this.GenerateUniqueUUID(15).then((UUID) => {
@@ -30,7 +29,6 @@ export class DataManager {
         return new Promise((res, rej) => {
             let UUID = this.GenerateUUID(length);
             this.UUIDExists(UUID).then((valExists) => {
-                console.log(UUID);
                 if (valExists) {
                     res(this.GenerateUniqueUUID(length));
                 } else {

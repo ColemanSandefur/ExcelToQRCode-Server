@@ -14,6 +14,7 @@ const argv = yargs.argv;
 
 //Adding directories
 app.use(express.static(__dirname + "/public"));
+app.use(bodyParser.json()) // handle json data
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(path.join(__dirname, "static")));
 
@@ -35,13 +36,6 @@ app.get("/", (req, res) => {
     fs.readFile(__dirname + "/index.html", (err, html) => {
         res.send(ejs.render(html.toString()));
     });
-
-    DataManager.EditRow("1NZHW7RWMNIEQ9L", {"valveFlow": false}).then((data) => {
-        console.log(data);
-        DataManager.GetRow("1NZHW7RWMNIEQ9L").then((data) => {
-            console.log(data);
-        })
-    });
 });
 
 //Scanned qr codes get linked here
@@ -62,13 +56,20 @@ app.get("/decode/:UUID", (req, res) => {
 
 app.post("/encode", (req, res) => {
     //Get data from post: req.body.value
+    //Make sure that each of the fields are defined before trying to instert it to the database
+    if (req.body.valveFlow == undefined || req.body.fluid == undefined || req.body.valveID == undefined) {
+        res.send(null);
+        return;
+    }
     DataManager.AddRow(req.body.valveFlow, req.body.fluid, req.body.valveID).then((UUID) => {
-        res.send(UUID);
+        res.send(UUID); //UUID will either be a string or null
     });
 });
 
 app.post("/update", (req, res) => {
     let data:{"valveFlow"?: boolean, "fluid"?: number, "valveID"?: number} = {};
+
+    //Put only defined variables into data
     if (req.body.valveFlow != undefined) {
         data.valveFlow = req.body.valveFlow;
     }
@@ -79,11 +80,8 @@ app.post("/update", (req, res) => {
         data.valveID = req.body.valveID;
     }
 
+    //Edit the row based on the data given
     DataManager.EditRow(req.body.UUID, data).then((success) => {
-        res.send(success);
-    })
+        res.send(success); //success is true or false (wether or not it succeeded)
+    });
 });
-
-function base64Decode(base64: string): string {
-    return Buffer.from(base64, 'base64').toString('ascii');
-}
