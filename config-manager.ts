@@ -24,6 +24,7 @@ export class ConfigManager {
         let newConfig:Config = new Config();
         newConfig.database = {"host": "localhost", "user": "root", "password": "", "databaseName": "qr_valve_data"};
         newConfig.fluids = ["water","petrolium", "crude oil"];
+        this.config = newConfig;
         fs.writeFileSync(path, JSON.stringify(newConfig, null, "\t"));
     }
 }

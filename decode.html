@@ -33,7 +33,7 @@
                         data: {
                             UUID: $("#uuid").text(),
                             valveFlow: $("#valveFlow").children("p").text() == "Open" ? true : false,
-                            fluid: $("#fluid").children("select").val()
+                            fluid: validFluids.indexOf($("#fluid").children("select").val())
                         },
                         success: function(msg) {
                         }
