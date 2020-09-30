@@ -119,6 +119,9 @@ export class DataManager {
         let encoded = new EncodeValveTable();
 
         encoded.id = table.id;
+        if (ConfigManager.config.fluids.indexOf(table.fluid) == -1) {
+            ConfigManager.addLiquids([table.fluid]);
+        }
         encoded.fluid = ConfigManager.config.fluids.indexOf(table.fluid)
         encoded.valveFlow = (table.valveFlow == true)? 1 : 0;
         encoded.valveID = table.valveID;

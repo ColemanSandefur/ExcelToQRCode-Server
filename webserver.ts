@@ -63,7 +63,7 @@ app.post("/encode", (req, res) => {
         res.send(null);
         return;
     }
-    DataManager.AddRow(req.body.valveFlow, req.body.fluid, req.body.valveID).then((UUID) => {
+    DataManager.AddRow(req.body.valveFlow, (<string>req.body.fluid).toLowerCase(), req.body.valveID).then((UUID) => {
         res.send(UUID); //UUID will either be a string or null
     });
 });

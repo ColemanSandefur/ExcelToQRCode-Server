@@ -11,8 +11,10 @@ export class Config {
 }
 export class ConfigManager {
     static config: Config;
+    private static path: string;
 
     static loadConfig(path: string) {
+        this.path = path;
         if (fs.existsSync(path)) {
             this.config = JSON.parse(fs.readFileSync(path).toString());
         } else {
@@ -26,5 +28,15 @@ export class ConfigManager {
         newConfig.fluids = ["water","petrolium", "crude oil"];
         this.config = newConfig;
         fs.writeFileSync(path, JSON.stringify(newConfig, null, "\t"));
+    }
+
+    public static addLiquids(liquids: string[]) {
+        liquids.forEach(liquid => {
+            if (this.config.fluids.indexOf(liquid) == -1) {
+                this.config.fluids.push(liquid);
+            }
+        });
+
+        fs.writeFileSync(this.path, JSON.stringify(this.config, null, "\t"));
     }
 }
