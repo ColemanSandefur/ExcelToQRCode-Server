@@ -77,7 +77,7 @@ app.post("/update", (req, res) => {
         data.valveFlow = req.body.valveFlow;
     }
     if (req.body.fluid != undefined) {
-        data.fluid = req.body.fluid;
+        data.fluid = ConfigManager.config.fluids[(req.body.fluid)];
     }
     if (req.body.valveID != undefined) {
         data.valveID = req.body.valveID;
