@@ -74,10 +74,10 @@ app.post("/update", (req, res) => {
 
     //Put only defined variables into data
     if (req.body.valveFlow != undefined) {
-        data.valveFlow = req.body.valveFlow;
+        data.valveFlow = (<string>req.body.valveFlow).toLowerCase() == "true"? true : false; // Convert from string to boolean
     }
     if (req.body.fluid != undefined) {
-        data.fluid = ConfigManager.config.fluids[(req.body.fluid)];
+        data.fluid = ConfigManager.config.fluids[(req.body.fluid)]; // Convert the index to a string
     }
     if (req.body.valveID != undefined) {
         data.valveID = req.body.valveID;

@@ -15,6 +15,7 @@ body {
     padding: 10px;
     display: inline-block;
     border-radius: 10px;
+    text-align: center;
 
     grid-template-rows: 2rem auto;
 
@@ -28,6 +29,10 @@ body {
     hr {
         padding: 0;
         margin: 0;
+        border-style: solid;
+        color: black;
+        background-color: black;
+        height:0;
     }
 
     p,select {
@@ -37,6 +42,7 @@ body {
         font-size: 1.5rem;
         margin-top: .5rem;
         border: none;
+        
 
         &.button {
             background-color:lightgray;
@@ -52,9 +58,19 @@ body {
 
 .boxHolder {
     width: 100vw;
-    height: 100vh;
+    // height: 100vh;
     margin: 0;
     padding: .5rem;
     display: inline-block;
 }
 
+html[screen-size="small"] {
+    .boxHolder {
+        text-align: center;
+    }
+    .dataSquare{
+        width: 100%;
+        margin:0;
+        margin-bottom: .5rem;
+    }
+}

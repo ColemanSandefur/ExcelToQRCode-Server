@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/decode.css">
     <title>decode</title>
@@ -31,9 +32,9 @@
                         url: "/update",
                         type: "POST",
                         data: {
-                            UUID: $("#uuid").text(),
-                            valveFlow: $("#valveFlow").children("p").text() == "Open" ? true : false,
-                            fluid: validFluids.indexOf($("#fluid").children("select").val())
+                            UUID: $("#uuid").text(), //Just the text
+                            valveFlow: $("#valveFlow").children("p").text() == "Open" ? true : false, //convert the text to true and false
+                            fluid: validFluids.indexOf($("#fluid").children("select").val()) // Convert selection to index
                         },
                         success: function(msg) {
                         }
@@ -61,7 +62,6 @@
                     let titleHtml = $(`<h1>${title}</h1>`);
                     let valueHtml = $(`<p class="button">${value}</p>`)
                     valueHtml.click(callback);
-                    // valueHtml.on("click", callback(event));
                     container.append([titleHtml, $("<hr>"), valueHtml]);
                     return container;
                 }
@@ -71,7 +71,6 @@
                     let titleHtml = $(`<h1>${title}</h1>`);
                     let valueHtml = $(`<p class="button">${value}</p>`)
                     valueHtml.click(callback);
-                    // valueHtml.on("click", callback(event));
                     container.append([titleHtml, $("<hr>"), valueHtml]);
                     return container;
                 }
@@ -122,7 +121,19 @@
                         $(".boxHolder").append(square);
                     }
                 });
+
+                changedWindowSize();
             });
+
+            function changedWindowSize() {
+                if ($("html").width() < 800) {
+                    $("html").attr("screen-size", "small");
+                } else {
+                    $("html").attr("screen-size", "large");
+                }
+            }
+
+            window.onresize = changedWindowSize;
         </script>
     <% } %> 
 </body>
